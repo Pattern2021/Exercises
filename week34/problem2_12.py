@@ -28,7 +28,7 @@ class BayesianClassifier2D:
                 return 1
         # else include risk throught given loss matrix.
         else:
-            if self.risk[1][0] * boundary0 - self.risk[0][1] * boundary1 >= 0:
+            if self.risk[0][1] * boundary0 - self.risk[1][0] * boundary1 >= 0:
                 return 0
             else:
                 return 1
@@ -76,8 +76,8 @@ if __name__ == "__main__":
     sigma1 = .2
     sigma2 = .2
     loss_matrix = np.array([[0, 1], [0.5, 0]])
-    cl = BayesianClassifier2D(mu0, mu1, sigma1, sigma2)
-    cl.test()
+    # cl = BayesianClassifier2D(mu0, mu1, sigma1, sigma2, loss_matrix)
+    # cl.test()
     mu2 = np.array([3, 3])
-    # cl2 = BayesianClassifier2D(mu0, mu2, sigma1, sigma2)
-    # cl2.test()
+    cl2 = BayesianClassifier2D(mu0, mu2, sigma1, sigma2, loss_matrix)
+    cl2.test()
