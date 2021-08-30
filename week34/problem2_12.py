@@ -76,8 +76,8 @@ if __name__ == "__main__":
     sigma1 = .2
     sigma2 = .2
     loss_matrix = np.array([[0, 1], [0.5, 0]])
-    # cl = BayesianClassifier2D(mu0, mu1, sigma1, sigma2, loss_matrix)
-    # cl.test()
-    mu2 = np.array([3, 3])
-    cl2 = BayesianClassifier2D(mu0, mu2, sigma1, sigma2, loss_matrix)
-    cl2.test()
+    cl = BayesianClassifier2D(mu0, mu1, sigma1, sigma2, loss_matrix)
+    cl.test()
+    # mu2 = np.array([3, 3])
+    # cl2 = BayesianClassifier2D(mu0, mu2, sigma1, sigma2, loss_matrix)
+    # cl2.test()
