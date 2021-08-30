@@ -1,2 +1,1 @@
-"# Exercises" 
-"# Exercises" 
+# Exercises
