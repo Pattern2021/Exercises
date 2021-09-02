@@ -14,7 +14,7 @@ class kNearestNeighbor2Class:
         Classifies point to either class 0 or class 1 based on euclidean distance between point and k nearest points.
         
         Args: 
-             (array or array-like) - point(s) to be classified.
+             (array or array-like) - point to be classified.
         Returns:
              (int) - either 0 for first class or 1 for second class.
         """
