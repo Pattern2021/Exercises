@@ -4,58 +4,78 @@ from time import time
 
 class Perceptron:
     def __init__(self, data1, data2):
+        # input data and corresponding labels
         self.data1 = data1
         self.data2 = data2
         label1 = np.ones(len(data1))
         label2 = np.ones(len(data2)) * -1
         labels = np.concatenate((label1, label2))
+        
+        # adding column of ones to data arrays
         data1 = np.append(data1, np.ones((len(data1), 1)), axis=1)
         data2 = np.append(data2, np.ones((len(data2), 1)), axis=1)
         data = np.concatenate((data1, data2))
+
+        # storing indices of data array
         self.indices = np.arange(len(data))
+
+        # shuffling data and corresponding labels
         self.data, self.labels = self.shuffle(data, labels)
+
+        # initialising random weights
         self.w = np.random.uniform(size=(3, 1))
+
+        # Booleans for checking if trained or tested
         self.trained = False
         self.tested = False
 
-    def train(self, rho, epochs=1000):
+    def train(self, rho, max_epochs=1000):
         self.start_time = time()
         self.trained = True
+
+        # Set previous weights as array of zeros
         prev_w = np.zeros_like(self.w)
-        c1 = 0
-        c2 = 0
-        c1_err = 0
-        c2_err = 0
+
+        # counter for iterations within for-loop
         t = 0
-        iters = 0
-        while t < len(self.data) and iters < epochs:
+
+        # counter for when we approach the max epochs
+        epochs = 0
+
+        # looping through while counter is less than lenght of data and total iterations is less than maximum epochs
+        while t < len(self.data) and epochs < max_epochs:
             t = 0
+
             for i in range(len(self.data)):
+
+                # reshape data to correct form
                 x = self.data[i].reshape(3, 1)
 
+                # Multiplying weights with data
                 mult = np.matmul(self.w.T, x)
+
+                # current label
                 lab = self.labels[i]
 
-                # missclassified of class1, update weights
+                # missclassified of class1 from current weights, update weights
                 if lab == 1 and mult <= 0:
                     self.w = self.w + rho * x
                 
-                # missclassified of class2, update weights
+                # missclassified of class2 from current weights, update weights
                 elif lab == -1 and mult >= 0:
-                    c2_err += 1
                     self.w = self.w - rho * x
                 
                 # correctly classified, do nothing
                 else:
-                    c1 += 1
-                    c2 += 1
                     t += 1
-            iters += 1
+            epochs += 1
         self.end_time = time()
         return self.w
     
     def test(self, Xte1, Xte2):
         self.tested = True
+
+        # Test data
         Xte1 = np.append(Xte1, np.ones((len(Xte1), 1)), axis=1)
         Xte2 = np.append(Xte2, np.ones((len(Xte2), 1)), axis=1)
         lab1 = np.ones(len(Xte1))
@@ -64,6 +84,7 @@ class Perceptron:
         lab = np.concatenate((lab1, lab2))
         Xte, lab = self.shuffle(Xte, lab)
 
+        # indices of classified test data
         i1 = []
         i2 = []
         for i, x in enumerate(Xte):
@@ -83,6 +104,8 @@ class Perceptron:
         false_c2 = classified_c2[classified_c2 == 1]
         c1 = Xte[i1]
         c2 = Xte[i2]
+
+        # Calculating the accuracy of the model
         self.accuracy = (len(correct_c1) + len(correct_c2)) / len(Xte)
         plt.scatter(c1[:, 0], c1[:, 1])
         plt.scatter(c2[:, 0], c2[:, 1])
