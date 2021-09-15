@@ -33,8 +33,9 @@ class LMS:
 
                 x = self.Xtr[k].reshape(3, 1)
                 y = self.Ytr[k]
+                rho_ = rho / (k+1) 
 
-                self.w = self.w + rho * x @ (y - x.T @ self.w)
+                self.w = self.w + rho_ * x @ (y - x.T @ self.w)
             it += 1
         print(it)
 
@@ -42,8 +43,8 @@ class LMS:
         w2 = self.w[0]
         w1 = self.w[1]
         w0 = self.w[2]
-        slope = (-w0 / w2) / (w0 / w1)
-        intercept = -w0 / w2
+        slope = (w0 / w2) / (w0 / w1)
+        intercept = w0 / w2
         xarr = np.arange(np.min(self.Xtr[:, 0]), np.max(self.Xtr[:, 0]), 0.1)
         plt.plot(xarr, slope * xarr + intercept)
         plt.scatter(self.Xtr1[:, 0], self.Xtr1[:, 1])
@@ -73,7 +74,12 @@ class LMS:
         return data, labels        
 
 def main():
-    np.random.seed(1)
+    # np.random.seed(1)
+    seed = np.random.randint(0, 1e8)
+    # weird situation. seed = 88857357 yields a case where algorithm does not work, but seed = 49361358 does work well
+    print(seed)
+    np.random.seed(seed)
+
 
     mu1 = np.array([1, 1])
     mu2 = np.array([3, 3])
