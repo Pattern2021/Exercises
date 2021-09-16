@@ -1,11 +1,4 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import os
-import sys
-
-sys.path.insert(0, os.path.abspath(r"C:\Users\Christian Salomonsen\OneDrive - UiT Office 365\Desktop\UIT\FYS-3012\exercises"))
-
-from machinelearning.classifiers.Linear import LinearClassifier
+from Linear import *
 
 
 class LeastMeanSquares(LinearClassifier):
@@ -18,6 +11,7 @@ class LeastMeanSquares(LinearClassifier):
         Xtr2: array_like
             Trainingdata for class 2
     """
+
     def __init__(self, Xtr1, Xtr2):
         super().__init__(Xtr1, Xtr2)
 
@@ -34,36 +28,14 @@ class LeastMeanSquares(LinearClassifier):
 
         # Checking if the change of  thevalues of the weights are less than a threshold
         while np.any(np.where(np.abs(prev_w - self.w) > threshold, True, False) == True):
-            
+
             # Setting the previous weights as the newly calculated one.
             prev_w = self.w
             for k in range(len(self.Xtr)):
 
                 x = self.Xtr[k].reshape(3, 1)
                 y = self.Ytr[k]
-                rho_ = rho / (k+1) 
+                rho_ = rho / (k+1)
 
                 self.w = self.w + rho_ * x @ (y - x.T @ self.w)
             it += 1
-
-def main():
-    mu1 = np.array([1, 1])
-    mu2 = np.array([3, 3])
-    sigma1 = .2
-    sigma2 = sigma1
-
-    data1 = np.random.normal(mu1, sigma1, size=(100, 2))
-    data2 = np.random.normal(mu2, sigma2, size=(100, 2))
-
-    ins = LeastMeanSquares(data1, data2)
-    ins.train()
-    ins.plot_training()
-
-    test1 = np.random.normal(mu1, sigma1, size=(30, 2))
-    test2 = np.random.normal(mu2, sigma2, size=(30, 2))
-
-    ins.test(test1, test2)
-    ins.plot_testing()
-
-if __name__ == '__main__':
-    main()

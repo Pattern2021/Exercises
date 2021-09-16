@@ -1,7 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import os
+import sys
+from time import time
 
-from classifiers.Linear import LinearClassifier
+sys.path.insert(0, os.path.abspath(r"C:\Users\Christian Salomonsen\OneDrive - UiT Office 365\Desktop\UIT\FYS-3012\exercises"))
+
+from machinelearning.classifiers.Linear import LinearClassifier
 
 class SumOfErrorSquares(LinearClassifier):
     """
