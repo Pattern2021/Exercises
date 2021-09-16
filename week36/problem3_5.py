@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from time import time
 
 from classifiers.Linear import LinearClassifier
 
@@ -14,7 +13,6 @@ class Perceptron(LinearClassifier):
         self.name = "Perceptron"
 
     def train(self, rho, max_epochs=1000):
-        self.start_time = time()
         self.trained = True
 
         # Set previous weights as array of zeros
@@ -53,8 +51,6 @@ class Perceptron(LinearClassifier):
                 else:
                     t += 1
             epochs += 1
-        self.end_time = time()
-        return self.w
 
 def main():
     mu1 = np.array([1, 1])
