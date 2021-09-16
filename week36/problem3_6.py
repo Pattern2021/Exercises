@@ -2,18 +2,20 @@ import numpy as np
 import matplotlib.pyplot as plt
 from time import time
 
-class LMS:
+from classifiers.Linear import LinearClassifier
+
+class LMS(LinearClassifier):
+    """
+    Linear Clasifier using Least means squares criterion. Inherits from Linear Classifier base class.
+
+    Args:
+        Xtr1: array_like
+            Trainingdata for class 1
+        Xtr2: array_like
+            Trainingdata for class 2
+    """
     def __init__(self, Xtr1, Xtr2):
-        self.Xtr1, self.Xtr2 = Xtr1, Xtr2
-        self.Ytr = np.concatenate((np.ones(len(Xtr1)), np.ones(len(Xtr2)) * -1))
-        self.Xtr = np.concatenate((Xtr1, Xtr2))
-        self.Xtr = np.append(self.Xtr, np.ones((len(self.Xtr), 1)), axis=1)
-        self.Xtr, self.labels = self.shuffle(self.Xtr, self.Ytr)
-
-        self.trained = False
-        self.tested = False
-
-        self.w = np.random.uniform(size=(3, 1))
+        super().__init__(Xtr1, Xtr2)
 
     def train(self, rho=0.01, threshold=1e-5):
         self.trained = True
@@ -37,14 +39,14 @@ class LMS:
 
                 self.w = self.w + rho_ * x @ (y - x.T @ self.w)
             it += 1
-        print(it)
+        print("Training runs over dataset: ", it)
 
         self.w = self.w.flatten()
         w2 = self.w[0]
         w1 = self.w[1]
         w0 = self.w[2]
-        slope = (w0 / w2) / (w0 / w1)
-        intercept = w0 / w2
+        slope = (-w0 / w2) / (w0 / w1)
+        intercept = -w0 / w2
         xarr = np.arange(np.min(self.Xtr[:, 0]), np.max(self.Xtr[:, 0]), 0.1)
         plt.plot(xarr, slope * xarr + intercept)
         plt.scatter(self.Xtr1[:, 0], self.Xtr1[:, 1])
@@ -55,29 +57,11 @@ class LMS:
         self.tested = True
         pass
 
-    def is_trained(self):
-        if not self.trained:
-            print("Not yet trained")
-            exit()
-
-    def is_tested(self):
-        if not self.tested:
-            print("Not yet tested")
-            exit()
-
-    @staticmethod
-    def shuffle(data, labels):
-        ind = np.arange(len(data))
-        np.random.shuffle(ind)
-        data = data[ind]
-        labels = labels[ind]
-        return data, labels        
-
 def main():
     # np.random.seed(1)
     seed = np.random.randint(0, 1e8)
     # weird situation. seed = 88857357 yields a case where algorithm does not work, but seed = 49361358 does work well
-    print(seed)
+    print("Seed: ", seed)
     np.random.seed(seed)
 
 
