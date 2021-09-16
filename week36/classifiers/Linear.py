@@ -28,9 +28,16 @@ class LinearClassifier:
         else:
             self.w = np.random.uniform(size=(3, 1))
 
-        
-
     def test(self, Xte1, Xte2):
+        """
+        Test method for all supervised linear learning methods using weights
+
+        Parameters:
+            Xte1: array_like
+                Test data from class 1
+            Xte2: array_like
+                Test data from class 2
+        """
         self.tested = True
 
         class_label1 = 1
@@ -62,16 +69,28 @@ class LinearClassifier:
         self.accuracy = (len(self.correct_c1) + len(self.correct_c2)) / len(self.Yte[0])
 
     def is_trained(self):
-        if not self.trained:
-            print("Model not been trained! Use class.train(rho)")
+        """ Method for checking and handling errors if user is inappropriatly trying to plot training or test before training. """
+        # if not self.trained:
+        #     print("Model not been trained! Use class.train(rho)")
+        #     exit()
+        try:
+            if not self.trained:
+                raise Exception("Model must be trained!")
+        except Exception as e:
+            print(e)
             exit()
-    
+
     def is_tested(self):
-        if not self.tested:
-            print("Model has not been tested! Use class.test()")
+        """ Method for checking and handling errors if user is inappropriatly trying to plot the test before testing. """
+        try:
+            if not self.tested:
+                raise Exception("Model must be tested!")
+        except Exception as e:
+            print(e)
             exit()
 
     def decision_boundary_to_plot(self):
+        """ Adds the decision boundary to current plot. """
         self.is_trained()
 
         self.w = self.w.flatten()
