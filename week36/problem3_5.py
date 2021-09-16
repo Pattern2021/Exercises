@@ -2,32 +2,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from time import time
 
-class Perceptron:
-    def __init__(self, data1, data2):
-        # input data and corresponding labels
-        self.data1 = data1
-        self.data2 = data2
-        label1 = np.ones(len(data1))
-        label2 = np.ones(len(data2)) * -1
-        labels = np.concatenate((label1, label2))
-        
-        # adding column of ones to data arrays
-        data1 = np.append(data1, np.ones((len(data1), 1)), axis=1)
-        data2 = np.append(data2, np.ones((len(data2), 1)), axis=1)
-        data = np.concatenate((data1, data2))
+from classifiers.Linear import LinearClassifier
+
+class Perceptron(LinearClassifier):
+    def __init__(self, Xtr1, Xtr2):
+        super().__init__(Xtr1, Xtr2)
 
         # storing indices of data array
-        self.indices = np.arange(len(data))
-
-        # shuffling data and corresponding labels
-        self.data, self.labels = self.shuffle(data, labels)
-
-        # initialising random weights
-        self.w = np.random.uniform(size=(3, 1))
-
-        # Booleans for checking if trained or tested
-        self.trained = False
-        self.tested = False
+        self.indices = np.arange(len(self.Xtr))
 
     def train(self, rho, max_epochs=1000):
         self.start_time = time()
@@ -43,19 +25,19 @@ class Perceptron:
         epochs = 0
 
         # looping through while counter is less than lenght of data and total iterations is less than maximum epochs
-        while t < len(self.data) and epochs < max_epochs:
+        while t < len(self.Xtr) and epochs < max_epochs:
             t = 0
 
-            for i in range(len(self.data)):
+            for i in range(len(self.Xtr)):
 
                 # reshape data to correct form
-                x = self.data[i].reshape(3, 1)
+                x = self.Xtr[i].reshape(3, 1)
 
                 # Multiplying weights with data
                 mult = np.matmul(self.w.T, x)
 
                 # current label
-                lab = self.labels[i]
+                lab = self.Ytr[i]
 
                 # missclassified of class1 from current weights, update weights
                 if lab == 1 and mult <= 0:
@@ -110,20 +92,9 @@ class Perceptron:
         plt.scatter(c1[:, 0], c1[:, 1])
         plt.scatter(c2[:, 0], c2[:, 1])
 
-
-    def is_trained(self):
-        if not self.trained:
-            print("Model not been trained! Use class.train(rho)")
-            exit()
-    
-    def is_tested(self):
-        if not self.tested:
-            print("Model has not been tested! Use class.test()")
-            exit()
-
     def plot_results(self):
         self.is_trained()
-        x1_vals = np.append(self.data1[:, 0], self.data2[:, 0])
+        x1_vals = np.append(self.Xtr1[:, 0], self.Xtr2[:, 0])
         xarr = np.arange(np.min(x1_vals), np.max(x1_vals), 0.1)
         w0 = self.w[2][0]
         w1 = self.w[1][0]
@@ -133,20 +104,12 @@ class Perceptron:
         plt.plot(xarr, slope * xarr + intercept)
         #plt.scatter(self.data1[:, 0], self.data1[:, 1])
         #plt.scatter(self.data2[:, 0], self.data2[:, 1])
-        title = "Perceptron algorithm decision boundary for N = {0:} datapoints,\ntraining took ={1:.3f} s".format(len(self.data), self.end_time - self.start_time)
+        title = "Perceptron algorithm decision boundary for N = {0:} datapoints,\ntraining took ={1:.3f} s".format(len(self.Xtr), self.end_time - self.start_time)
         if self.tested:
             title += "\nAccuracy = {:.3f}".format(self.accuracy)
             
         plt.title(title)
         plt.show()
-
-    @staticmethod
-    def shuffle(data, labels):
-        ind = np.arange(len(data))
-        np.random.shuffle(ind)
-        data = data[ind]
-        labels = labels[ind]
-        return data, labels
 
 
 
