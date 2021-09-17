@@ -22,7 +22,7 @@ class LeastMeanSquares(LinearClassifier):
         super().__init__(Xtr1, Xtr2)
 
         self.name = "Least Mean Squares"
-
+    
     def train(self, rho=0.01, threshold=1e-5):
         self.trained = True
 
