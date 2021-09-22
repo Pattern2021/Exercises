@@ -5,6 +5,8 @@ from networks.multilayer_perceptron import Multilayer_perceptron
 
 
 def main():
+    np.random.seed(1)
+
     mu1 = np.array([0, 0])
     mu2 = np.array([1, 1])
     mu3 = np.array([0, 1])

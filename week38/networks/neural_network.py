@@ -1,11 +1,13 @@
-from os import stat
-from numba.core.types.abstract import InitialValue
 import numpy as np
 import matplotlib.pyplot as plt
 from numba import njit
 from time import time
+import os
+import sys
 
-from numpy.lib.index_tricks import AxisConcatenator
+sys.path.insert(0, os.path.dirname(__file__))
+
+from network import Network
 
 class NeuralNetwork:
     """ 
@@ -20,54 +22,16 @@ class NeuralNetwork:
             Array with information of the structure of the network. len(structure) represents the number of layers, whilst values represents neurons within.
     """
     def __init__(self, Xtr, Ytr, network_structure):
+        self.network = Network(network_structure)
+        self.w = self.network.w
         self.Xtr, self.Ytr = self.shuffle(Xtr, Ytr)
         self.Xtr = np.append(self.Xtr, np.ones((len(self.Xtr), 1)), axis=1)
-        self.layers = network_structure
-        self.w = self.initialize_weights(self.layers)
-        self.y = np.unique(self.Ytr)
+        # self.y = np.unique(self.Ytr)
 
 
     def backprop(self, w, activations, z_arr, e):
-        print(activations)
-        print(z_arr)
-        # deltas = np.zeros(len(z_arr[:, 0]))
-        # print(deltas)
-        # deltas[-1] = e * self.sigmoid_derivative(z_arr[-1])
-        # print(deltas)
-        # errors = [e]
+        print(len(z_arr))
 
-        # loop
-        i = 0
-        while i < len(z_arr):
-            r = len(z_arr) - i
-
-            error_layer = deltas[r] @ w[r]
-
-            errors.append()
-
-
-
-
-        exit()
-
-
-
-        # for i, z in enumerate(z_arr[::-1]):
-        #     r = len(z_arr) - i
-
-        #     e_r 
-        #     deltas.append(e_r)
-
-
-
-    @staticmethod
-    def initialize_weights(layers):
-        bias = 1
-        w = []
-        for i, neurons in enumerate(layers):
-            if i > 0 and i <= len(layers):
-                w.append(np.random.uniform(size=(neurons, layers[i - 1] + bias)))
-        return w
 
     @staticmethod
     def sigmoid_derivative(x):
