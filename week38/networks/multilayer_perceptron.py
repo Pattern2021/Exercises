@@ -21,30 +21,52 @@ class Multilayer_perceptron(NeuralNetwork):
         super().__init__(Xtr, Ytr, network_structure)
 
     def train(self, mu=1):
+        J = 0
         # For each datapoint
-        for i, x in enumerate(self.Xtr[:3]):
+        for i, x in enumerate(self.Xtr[:1]):
 
             # for each layer
-            a = x.reshape(3, 1)
-            z_arr = []
-            activations = []
-
-            for i, w_in_layer in enumerate(self.w):
-                z = w_in_layer @ a
-
-                if z.shape != x.reshape(3,1).shape:
-                    one = np.ones((1,1))
-                    z = np.concatenate((z, one))
-
-                a = self.sigmoid(z)
-
-                # store theese for backpropagation
-                if len(a) > 0:
-                    activations.append(a)
-                    z_arr.append(z)
+            y_prev = x.reshape(3, 1)
             
-            # Cost function
-            error = np.sum((a - self.y) ** 2, axis=0)
+            y_prev_arr = []
+            v_arr = []
+            # loops through all layers which has a weight defined.
+            for layer in self.network.layers[1:]:
+                layer.calc_v(y_prev)
 
+                # Temporary fix, but i think its not right. Inserting a noter row of only a one in v as we need this to get the correct shape.
+                if layer.v.shape != x.reshape(3, 1).shape:
+                    one = np.ones((1, 1))
+                    layer.v = np.concatenate((layer.v, one))
+                
+                y_prev = self.sigmoid(layer.v)
+                last_v = layer.v
+                v_arr.append(layer.v)
+                y_prev_arr.append(y_prev)
 
-            self.w = self.backprop(self.w, activations, z, error)
+            y = y_prev
+            # cost function
+            error = np.sum((y - self.Ytr[i]))
+            J += error
+            
+            # backpropagation
+            e = np.sum(y - self.Ytr[i], axis=1)
+            last_delta = e @ self.sigmoid_derivative(last_v)
+            e_arr = [e]
+            deltas = [last_delta]
+            
+            e_arr.insert(0, deltas[-1] @ self.w[-1])
+            deltas.insert(0, e_arr[-2] @ self.sigmoid_derivative(v_arr[-2]))
+
+            # print(y_prev_arr)
+            # print(deltas)
+            # exit()
+
+            for i, w in enumerate(self.w):
+                # print(y_prev_arr[i].T.shape)
+                # print(np.atleast_2d(deltas[i]).shape)
+                # print((np.atleast_2d(deltas[i]) @ y_prev_arr[i].T).shape)
+                # # exit()
+                # print(w.shape)
+                delta_w = - mu * np.atleast_2d(deltas[i]) @ y_prev_arr[i].T
+                self.network.layers[i + 1].update_weights(delta_w[::-1])
