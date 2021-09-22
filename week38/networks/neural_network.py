@@ -28,12 +28,35 @@ class NeuralNetwork:
 
 
     def backprop(self, w, activations, z_arr, e):
-        deltas = [e * self.sigmoid_derivative(z_arr[-1])]
-        for i, z in enumerate(z_arr[::-1]):
+        print(activations)
+        print(z_arr)
+        # deltas = np.zeros(len(z_arr[:, 0]))
+        # print(deltas)
+        # deltas[-1] = e * self.sigmoid_derivative(z_arr[-1])
+        # print(deltas)
+        # errors = [e]
+
+        # loop
+        i = 0
+        while i < len(z_arr):
             r = len(z_arr) - i
 
-            e_r 
-            deltas.append(e_r)
+            error_layer = deltas[r] @ w[r]
+
+            errors.append()
+
+
+
+
+        exit()
+
+
+
+        # for i, z in enumerate(z_arr[::-1]):
+        #     r = len(z_arr) - i
+
+        #     e_r 
+        #     deltas.append(e_r)
 
 
 
