@@ -2,3 +2,4 @@ kernel_function_2d_test.py
 __pycache__
 vec2d.py
 .gitignore
+.DS_Store
