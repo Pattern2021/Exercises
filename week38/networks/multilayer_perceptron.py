@@ -5,6 +5,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from neural_network import *
 
+
 class Multilayer_perceptron(NeuralNetwork):
     """ 
     Multilayer network implementation of perceptron algorithm. Child which inherits from neural network base class.
