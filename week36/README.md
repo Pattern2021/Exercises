@@ -6,6 +6,15 @@
 
 #### Perceptron
 
+##### 1. After tweaking learning rate, inseparable classes
+
+![perceptron_tweaking_parameters](img/perceptron_tweaking_parameters.png)
+
+![perceptron_twaking_parameters_decision_bound](img/perceptron_twaking_parameters_decision_bound.png)
+
+
+##### 2. Before tweaking learning rate, but separable classes
+
 ![perceptron_training](img/perceptron_training.png)
 
 ![perceptron_testing](img/perceptron_testing.png)

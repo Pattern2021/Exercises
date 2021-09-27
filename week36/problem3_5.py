@@ -28,10 +28,11 @@ class Perceptron(LinearClassifier):
 
         # counter for when we approach the max epochs
         epochs = 0
-
+        tot_miss=[]
         # looping through while counter is less than lenght of data and total iterations is less than maximum epochs
-        while t < len(self.Xtr) and epochs < max_epochs:
+        while epochs < max_epochs:  # t < len(self.Xtr) and
             t = 0
+            missclassifications = 0
 
             for i in range(len(self.Xtr)):
 
@@ -46,28 +47,38 @@ class Perceptron(LinearClassifier):
 
                 # missclassified of class1 from current weights, update weights
                 if lab == 1 and mult <= 0:
+                    missclassifications += 1
                     self.w = self.w + rho * x
                 
                 # missclassified of class2 from current weights, update weights
                 elif lab == -1 and mult >= 0:
+                    missclassifications += 1
                     self.w = self.w - rho * x
                 
                 # correctly classified, do nothing
                 else:
                     t += 1
             epochs += 1
+            tot_miss.append(missclassifications)
+        epoch_arr = np.arange(max_epochs)
+        plt.plot(epoch_arr, tot_miss)
+        plt.title("Training error")
+        plt.xlabel("Epochs")
+        plt.ylabel("Error")
+        plt.show()
+
 
 def main():
     mu1 = np.array([1, 1])
     mu2 = np.array([0, 0])
-    sigma1 = .2
+    sigma1 = .5
     sigma2 = sigma1
 
     data1 = np.random.normal(mu1, sigma1, size=(100, 2))
     data2 = np.random.normal(mu2, sigma2, size=(100, 2))
 
     ins = Perceptron(data1, data2)
-    ins.train(1)
+    ins.train(0.00008) #  0.0004 > Stable and good < 0.00005 unstable or slow convergence else
     ins.plot_training()
     test1 = np.random.normal(mu1, sigma1, size=(30, 2))
     test2 = np.random.normal(mu2, sigma2, size=(30, 2))
