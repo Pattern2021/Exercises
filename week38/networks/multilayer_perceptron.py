@@ -49,6 +49,7 @@ class Multilayer_perceptron(NeuralNetwork):
                 
                 y = self.sigmoid(v)
                 y_prev = y
+                
 
                 self.y_arr.append(y)
             
