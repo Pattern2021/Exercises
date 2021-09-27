@@ -5,7 +5,7 @@ from networks.multilayer_perceptron import Multilayer_perceptron
 
 
 def main():
-    np.random.seed(1)
+    # np.random.seed(1)
 
     mu1 = np.array([0, 0])
     mu2 = np.array([1, 1])
@@ -39,7 +39,7 @@ def main():
     network_shape = np.array([2, 2, 1])
 
     ins = Multilayer_perceptron(Xtraining, Ytraining, network_shape)
-    ins.train(0.01, epochs=300)
+    ins.train(0.001, epochs=1000, alpha=0.75)
     ins.plot_training()
     # Xtest, Ytest = ins.shuffle(Xtraining, Ytraining)
     # Xtest = ins.onecolumn(Xtest)
