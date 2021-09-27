@@ -27,6 +27,9 @@ class Multilayer_perceptron(NeuralNetwork):
         v_mat_shape = (self.network.shape[:-1] + np.array([0, 1]))
         self.v_mat = np.zeros(v_mat_shape)
 
+        self.y_arr = []
+        y_predictions = np.zeros_like(Ytr)
+
         for i, x in enumerate(Xtr):
             y_prev = np.atleast_2d(x)
 
@@ -47,15 +50,28 @@ class Multilayer_perceptron(NeuralNetwork):
                 y = self.sigmoid(v)
                 y_prev = y
 
-                if r < len(self.v_mat) - 1:
-                    self.y_last_hidden = y
+                self.y_arr.append(y)
             
-            MSE = np.sum((y - Ytr[i]) ** 2)
-            error = np.sum(y[0] - Ytr[i])  # np.sum(Ytr[i] - y[0])
+            # actual prediction
+            y_hat = np.where(np.round(y[0][0]) == np.round(y[0][1]), 1, 0)
+            y_predictions[i] = y_hat
+
+            MSE = np.sum((y_hat - Ytr[i]) ** 2)
+            error = np.sum(y_hat - Ytr[i])  # np.sum(Ytr[i] - y[0])
             J += MSE
             it += 1
 
-        return J / it, error
+        # cast to numpy array, this gives wierd 3d array shape
+        self.y_arr = np.array(self.y_arr)
+
+        # reshaping to 2d array
+        self.y_arr = self.y_arr.reshape((self.y_arr.shape[0], self.y_arr.shape[2]))
+        
+        # Pick out every odd item of list
+        self.y_arr_prev_layer = self.y_arr[::2]
+
+
+        return J / it, error, y_predictions
 
     def backward_propagate(self, error):
         last_delta = error * self.sigmoid_derivative(self.v_mat[-1])
@@ -75,9 +91,14 @@ class Multilayer_perceptron(NeuralNetwork):
         
     def update_weights(self):
 
+        # is the input from first node and input from second node to third node. has shape (2, 3, N)
+        y = np.array([self.Xtr, self.y_arr_prev_layer])
+        
         # loop through each layer except input layer.
         for r, layer in enumerate(self.network.layers[1:]):
-            delta_w = - self.learning_rate * self.deltas[r] @ self.y_last_hidden.T
+
+            delta_w = - self.learning_rate * np.sum(self.deltas[r] @ y[r].T)
+
             for neuron in layer.nodes:
                 neuron.change_class_weights(neuron.w + delta_w)
 
@@ -89,19 +110,20 @@ class Multilayer_perceptron(NeuralNetwork):
         cost_arr = []
         error_arr = []
         for epoch in epochs:
-            cost, error = self.forward_propagate(self.Xtr, self.Ytr)
+            cost, error, y_pred = self.forward_propagate(self.Xtr, self.Ytr)
             self.deltas = self.backward_propagate(error)
             self.update_weights()
             cost_arr.append(cost)
             # print(error)
             error_arr.append(error)
-        plt.plot(epochs, error_arr, label="error")
-        plt.plot(epochs, cost_arr, label="cost")
-        plt.legend()
-        plt.show()
+        # plt.plot(epochs, error_arr, label="error")
+        # plt.plot(epochs, cost_arr, label="cost")
+        # plt.legend()
+        # plt.show()
 
     def test(self, Xte, Yte):
-        cost, error = self.forward_propagate(Xte, Yte)
+        cost, error, y_pred = self.forward_propagate(Xte, Yte)
+        return cost, error, y_pred
 
     def plot_training(self):
 
@@ -109,3 +131,12 @@ class Multilayer_perceptron(NeuralNetwork):
         x2_range = np.arange(np.min(self.Xtr[:, 1]), np.max(self.Xtr[:, 1]), 0.1)
 
         X, Y = np.meshgrid(x1_range, x2_range)
+        
+        y_fakearr = np.zeros_like(x1_range)
+
+        for i in range(len(X)):
+            vec = np.c_[X[i], Y[i]]
+            vec = self.onecolumn(vec)
+
+            cost, error, y_pred = self.test(vec, y_fakearr)
+

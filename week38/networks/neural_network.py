@@ -27,6 +27,9 @@ class NeuralNetwork:
         self.Xtr, self.Ytr = self.shuffle(Xtr, Ytr)
         self.Xtr = np.append(self.Xtr, np.ones((len(self.Xtr), 1)), axis=1)
 
+    @staticmethod
+    def onecolumn(arr):
+        return np.append(arr, np.ones((len(arr), 1)), axis=1)
 
     @staticmethod
     def sigmoid_derivative(x):
