@@ -51,7 +51,7 @@ class Multilayer_perceptron(NeuralNetwork):
                     self.y_last_hidden = y
             
             MSE = np.sum((y - Ytr[i]) ** 2)
-            error = np.sum(y[0] - Ytr[i])
+            error = np.sum(y[0] - Ytr[i])  # np.sum(Ytr[i] - y[0])
             J += MSE
             it += 1
 
@@ -95,8 +95,9 @@ class Multilayer_perceptron(NeuralNetwork):
             cost_arr.append(cost)
             # print(error)
             error_arr.append(error)
-        plt.plot(epochs, error_arr)
-        plt.plot(epochs, cost_arr)
+        plt.plot(epochs, error_arr, label="error")
+        plt.plot(epochs, cost_arr, label="cost")
+        plt.legend()
         plt.show()
 
     def test(self, Xte, Yte):

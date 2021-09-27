@@ -60,6 +60,8 @@ class Node(Network):
 
     def change_class_weights(self, w):
         self.w = w
+
+        # Updates class hierarchy upwards.
         self.layer.update_class_weight()
         self.layer.network.update_class_weight()
 
