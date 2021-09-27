@@ -10,6 +10,12 @@ class Network:
         for layer in self.layers[1:]:
             self.w.append(layer.w_mat)
 
+    def update_class_weight(self):
+        self.w = []
+
+        for layer in self.layers[1:]:
+            self.w.append(layer.w_mat)
+
 class Layer(Network):
     def __init__(self, network, nodes, index):
         self.network = network
@@ -33,8 +39,11 @@ class Layer(Network):
             self.w_mat = np.array([node.w for node in self.nodes])
             self.w_mat = self.w_mat.reshape(self.w_mat.shape[0], self.w_mat.shape[2])
 
-    def update_weights(self, delta_w):
-        self.w_mat = self.w_mat + delta_w
+    def update_class_weight(self):
+        if self.index > 0:
+            self.w_mat = np.array([node.w for node in self.nodes])
+            self.w_mat = self.w_mat.reshape(self.w_mat.shape[0], self.w_mat.shape[2])
+
 
 class Node(Network):
     def __init__(self, layer, index):
@@ -48,6 +57,12 @@ class Node(Network):
         else:
             # weights at this node including bias. i.e. number of nodes in previous layer plus bias
             self.w = np.random.uniform(size=(1, prev_layer_nodes + 1))
+
+    def change_class_weights(self, w):
+        self.w = w
+        self.layer.update_class_weight()
+        self.layer.network.update_class_weight()
+
 
 def main():
     n1 = Network()

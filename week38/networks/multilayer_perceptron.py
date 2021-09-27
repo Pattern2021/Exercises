@@ -47,12 +47,11 @@ class Multilayer_perceptron(NeuralNetwork):
                 y = self.sigmoid(v)
                 y_prev = y
 
-                # print(len(self.v_mat))
                 if r < len(self.v_mat) - 1:
                     self.y_last_hidden = y
             
             MSE = np.sum((y - Ytr[i]) ** 2)
-            error = (y - Ytr[i])
+            error = np.sum(y[0] - Ytr[i])
             J += MSE
             it += 1
 
@@ -78,20 +77,30 @@ class Multilayer_perceptron(NeuralNetwork):
 
         # loop through each layer except input layer.
         for r, layer in enumerate(self.network.layers[1:]):
-
             delta_w = - self.learning_rate * self.deltas[r] @ self.y_last_hidden.T
-            layer.w_mat = layer.w_mat + delta_w
+            for neuron in layer.nodes:
+                neuron.change_class_weights(neuron.w + delta_w)
 
-    def train(self, mu=1):
+
+    def train(self, mu=1, epochs=1000):
+
         self.learning_rate = mu
-        cost, error = self.forward_propagate(self.Xtr, self.Ytr)
-        self.deltas = self.backward_propagate(error)
-        self.update_weights()
+        epochs = np.arange(epochs)
+        cost_arr = []
+        error_arr = []
+        for epoch in epochs:
+            cost, error = self.forward_propagate(self.Xtr, self.Ytr)
+            self.deltas = self.backward_propagate(error)
+            self.update_weights()
+            cost_arr.append(cost)
+            # print(error)
+            error_arr.append(error)
+        plt.plot(epochs, error_arr)
+        plt.plot(epochs, cost_arr)
+        plt.show()
 
     def test(self, Xte, Yte):
         cost, error = self.forward_propagate(Xte, Yte)
-
-
 
     def plot_training(self):
 

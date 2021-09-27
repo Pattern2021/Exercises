@@ -5,7 +5,7 @@ from networks.multilayer_perceptron import Multilayer_perceptron
 
 
 def main():
-    np.random.seed(1)
+    # np.random.seed(1)
 
     mu1 = np.array([0, 0])
     mu2 = np.array([1, 1])
@@ -35,8 +35,8 @@ def main():
     network_shape = np.array([2, 2, 1])
 
     ins = Multilayer_perceptron(Xtraining, Ytraining, network_shape)
-    ins.train()
-    ins.test(Xtraining[:30], Ytraining[:30])
+    ins.train(0.1, epochs=300)
+    # ins.test(Xtraining[:30], Ytraining[:30])
 
 if __name__ == "__main__":
     main()
