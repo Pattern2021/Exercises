@@ -2,9 +2,13 @@
 
 *Author: Christian Salomonsen*
 
-### Oppgave 4.2 status:
+### Resultater:
+1. Forstår ikke hvorfor cost function konvergerer mot 0.75 hver gang koden kjøres.
+2. Ser for meg at det må være en større feil i backpropagation, mindre sannsynlig, men også mulig er at det er problemer med måten vektene oppdateres, men dette skal være ok.
 
-###### 1. Fungerer ikke som den skal, ser ut til at `error` ligger et sted mellom 1.8 og konvergerer mot 1. Vil jo anta at denne ideelt sett skal konvergere mot null.
-###### 2. `cost` ser ut til å være flippet, siden vi bruker MSE og denne øker og skal konvergere mot null antar jeg at det bare er klasse-lablene som er flippet.
+![](\img\NN_not_working.png)
+![](\img\NN_not_working_db.png)
 
-![nn](img/nn.png)
+Bruker mu = 0.0001
+![](\img\NN_not_working2.png)
+![](\img\NN_not_working_db2.png)
