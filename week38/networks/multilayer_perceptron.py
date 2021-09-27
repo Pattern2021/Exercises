@@ -21,53 +21,81 @@ class Multilayer_perceptron(NeuralNetwork):
     def __init__(self, Xtr, Ytr, network_structure):
         super().__init__(Xtr, Ytr, network_structure)
 
-    def train(self, mu=1):
+    def forward_propagate(self, Xtr, Ytr):
         J = 0
-        # For each datapoint
-        for i, x in enumerate(self.Xtr[:1]):
+        it = 0
+        v_mat_shape = (self.network.shape[:-1] + np.array([0, 1]))
+        self.v_mat = np.zeros(v_mat_shape)
 
-            # for each layer
-            y_prev = x.reshape(3, 1)
-            
-            y_prev_arr = []
-            v_arr = []
+        for i, x in enumerate(Xtr):
+            y_prev = np.atleast_2d(x)
+
             # loops through all layers which has a weight defined.
-            for layer in self.network.layers[1:]:
-                layer.calc_v(y_prev)
-
-                # Temporary fix, but i think its not right. Inserting a noter row of only a one in v as we need this to get the correct shape.
-                if layer.v.shape != x.reshape(3, 1).shape:
-                    one = np.ones((1, 1))
-                    layer.v = np.concatenate((layer.v, one))
+            for r, layer in enumerate(self.network.layers[1:]):
+                # v = y_prev @ layer.w_mat.T
                 
-                y_prev = self.sigmoid(layer.v)
-                last_v = layer.v
-                v_arr.append(layer.v)
-                y_prev_arr.append(y_prev)
+                # # Now v has one less column than the input data, therefore concatenate bias.
+                # bias = np.random.uniform(size=(1,1))
+                # v = np.c_[v, bias]
+                v = np.zeros_like(y_prev)
 
-            y = y_prev
-            # cost function
-            error = np.sum((y - self.Ytr[i]))
-            J += error
+                for k, neuron in enumerate(layer.nodes):
+                    v[:, k] = np.sum(neuron.w * y_prev[:, k])
+
+                self.v_mat[r] = v
+                
+                y = self.sigmoid(v)
+                y_prev = y
+
+                # print(len(self.v_mat))
+                if r < len(self.v_mat) - 1:
+                    self.y_last_hidden = y
             
-            # backpropagation
-            e = np.sum(y - self.Ytr[i], axis=1)
-            last_delta = e @ self.sigmoid_derivative(last_v)
-            e_arr = [e]
-            deltas = [last_delta]
-            
-            e_arr.insert(0, deltas[-1] @ self.w[-1])
-            deltas.insert(0, e_arr[-2] @ self.sigmoid_derivative(v_arr[-2]))
+            MSE = np.sum((y - Ytr[i]) ** 2)
+            error = (y - Ytr[i])
+            J += MSE
+            it += 1
 
-            # print(y_prev_arr)
-            # print(deltas)
-            # exit()
+        return J / it, error
 
-            for i, w in enumerate(self.w):
-                # print(y_prev_arr[i].T.shape)
-                # print(np.atleast_2d(deltas[i]).shape)
-                # print((np.atleast_2d(deltas[i]) @ y_prev_arr[i].T).shape)
-                # # exit()
-                # print(w.shape)
-                delta_w = - mu * np.atleast_2d(deltas[i]) @ y_prev_arr[i].T
-                self.network.layers[i + 1].update_weights(delta_w[::-1])
+    def backward_propagate(self, error):
+        last_delta = error * self.sigmoid_derivative(self.v_mat[-1])
+        deltas = np.zeros_like(self.v_mat)
+        deltas[-1] = last_delta
+
+        # iterates backwards through layers but does not count over input layer
+        for layer in self.network.layers[:0:-1]:
+            r = layer.index
+
+            e = np.dot(deltas[r - 1], layer.w_mat.T)
+            if r >= 2:
+                der = self.sigmoid_derivative(self.v_mat[r - 2])
+                deltas[r - 2] = e * der
+
+        return deltas
+        
+    def update_weights(self):
+
+        # loop through each layer except input layer.
+        for r, layer in enumerate(self.network.layers[1:]):
+
+            delta_w = - self.learning_rate * self.deltas[r] @ self.y_last_hidden.T
+            layer.w_mat = layer.w_mat + delta_w
+
+    def train(self, mu=1):
+        self.learning_rate = mu
+        cost, error = self.forward_propagate(self.Xtr, self.Ytr)
+        self.deltas = self.backward_propagate(error)
+        self.update_weights()
+
+    def test(self, Xte, Yte):
+        cost, error = self.forward_propagate(Xte, Yte)
+
+
+
+    def plot_training(self):
+
+        x1_range = np.arange(np.min(self.Xtr[:, 0]), np.max(self.Xtr[:, 0]), 0.1)
+        x2_range = np.arange(np.min(self.Xtr[:, 1]), np.max(self.Xtr[:, 1]), 0.1)
+
+        X, Y = np.meshgrid(x1_range, x2_range)

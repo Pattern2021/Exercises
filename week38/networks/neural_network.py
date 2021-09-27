@@ -26,11 +26,6 @@ class NeuralNetwork:
         self.w = self.network.w
         self.Xtr, self.Ytr = self.shuffle(Xtr, Ytr)
         self.Xtr = np.append(self.Xtr, np.ones((len(self.Xtr), 1)), axis=1)
-        # self.y = np.unique(self.Ytr)
-
-
-    def backprop(self, w, activations, z_arr, e):
-        print(len(z_arr))
 
 
     @staticmethod

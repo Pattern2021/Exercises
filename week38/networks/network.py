@@ -32,9 +32,6 @@ class Layer(Network):
         if self.index > 0:
             self.w_mat = np.array([node.w for node in self.nodes])
             self.w_mat = self.w_mat.reshape(self.w_mat.shape[0], self.w_mat.shape[2])
-        
-    def calc_v(self, y_prev):
-        self.v = self.w_mat @ y_prev
 
     def update_weights(self, delta_w):
         self.w_mat = self.w_mat + delta_w
