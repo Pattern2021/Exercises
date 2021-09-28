@@ -3,12 +3,14 @@ import numpy as np
 class Network:
     def __init__(self, shape=np.array([2, 2, 1])):
         self.shape = shape
+
         self.layers = [Layer(self, nodes, layer_index) for layer_index, nodes in enumerate(self.shape)]
         self.w = []
         
         # looping through layer except the first one.
         for layer in self.layers[1:]:
             self.w.append(layer.w_mat)
+        
 
     def update_class_weight(self):
         self.w = []

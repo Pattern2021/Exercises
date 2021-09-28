@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from networks.multilayer_perceptron import Multilayer_perceptron
 
 
-
 def main():
     # np.random.seed(1)
 
@@ -39,8 +38,8 @@ def main():
     network_shape = np.array([2, 2, 1])
 
     ins = Multilayer_perceptron(Xtraining, Ytraining, network_shape)
-    ins.train(0.0001, epochs=1000, alpha=0.75)
-    ins.plot_training()
+    ins.train(0.1, epochs=1, alpha=0.75)
+    # ins.plot_training()
     # Xtest, Ytest = ins.shuffle(Xtraining, Ytraining)
     # Xtest = ins.onecolumn(Xtest)
     # Xtest = Xtest[:30]

@@ -25,68 +25,47 @@ class Multilayer_perceptron(NeuralNetwork):
     def forward_propagate(self, Xtr, Ytr):
         J = 0
         it = 0
-        v_mat_shape = (self.network.shape[:-1] + np.array([0, 1]))
-        self.v_mat = np.zeros(v_mat_shape)
 
-        y_predictions = np.zeros_like(Ytr)
         missclassifications = 0
 
-        for i, x in enumerate(Xtr):
-            y_prev = np.atleast_2d(x)
-            
-            self.y_arr = []
+        y_prev = np.atleast_2d(Xtr)
+        self.v_arr = []
+        
+        # loops through all layers which has a weight defined.
+        for r, layer in enumerate(self.network.layers[1:]):
+            v = y_prev @ layer.w_mat.T
 
-            # loops through all layers which has a weight defined.
-            for r, layer in enumerate(self.network.layers[1:]):
-                # v = y_prev @ layer.w_mat.T
-                
-                # # Now v has one less column than the input data, therefore concatenate bias.
-                # bias = np.random.uniform(size=(1,1))
-                # v = np.c_[v, bias]
-                v = np.zeros_like(y_prev)
+            # add column of ones to v-matrix
+            if layer.index < len(layer.network.shape) - 1:
+                v = np.append(v, np.ones((len(v), 1)), axis=1)
 
-                for k, neuron in enumerate(layer.nodes):
-                    v[:, k] = np.sum(neuron.w * y_prev[:, k])
+            self.v_arr.append(v)
+            self.y = self.sigmoid(v)
+            y_prev = self.y
 
-                self.v_mat[r] = v
-                
-                y = self.sigmoid(v)
-                y_prev = y
 
-                self.y_arr.append(y)
-            
-            # actual prediction
-            y_hat = np.where(np.round(y[0][0]) == np.round(y[0][1]), 1, 0)
-            y_predictions[i] = y_hat
+        MSE = np.sum((self.y - Ytr) ** 2, axis=0) / len(Xtr)
 
-            MSE = np.sum((y - Ytr[i]) ** 2)
-            error = (y - Ytr[i])  # np.sum(Ytr[i] - y[0])
-            # print(Ytr[i], y_hat)
-            J += MSE
-            it += 1
-
-            missclassifications += np.abs(np.sum(y_hat - Ytr[i]))
-
-            # ===== backpropogation and updating weights =====
-            deltas = self.backward_propagate(error)
-            self.update_weights(deltas, x)
-
-        return J / it, missclassifications, y_predictions
+        error = np.sum((self.y - Ytr), axis=0) / len(Xtr)
+        # J += np.sum(MSE) / len(MSE)
+        # missclassifications += np.sum(np.abs(np.round(y) - Ytr), axis=0)
+        # print(J)
+        self.backward_propagate(error)
 
     def backward_propagate(self, error):
-        last_delta = error @ self.sigmoid_derivative(self.v_mat[-1])
-        deltas = np.zeros_like(self.v_mat)
-        deltas[-1] = last_delta
+        last_delta = error[:, None] * self.sigmoid_derivative(self.y)
+        
+        deltas = [last_delta]
 
         # iterates backwards through layers but does not count over input layer
         for layer in self.network.layers[:0:-1]:
             r = layer.index
-
-            e = np.dot(deltas[r - 1], layer.w_mat.T)
+            print(deltas[-1].shape, layer.w_mat[:, :-1].shape)
+            e = deltas[-1] @ layer.w_mat[:, :-1]
             if r >= 2:
-                der = self.sigmoid_derivative(self.v_mat[r - 2])
-                deltas[r - 2] = e * der
-
+                der = self.sigmoid_derivative(self.v_arr[r - 2])
+                deltas.append(e.T @ der)
+        print(deltas)
         return deltas
         
     def update_weights(self, deltas, x):
@@ -110,22 +89,26 @@ class Multilayer_perceptron(NeuralNetwork):
     def train(self, mu=1, epochs=1000, alpha=0):
         self.alpha = alpha
 
-        fig, axs = plt.subplots(2, 1, figsize=(8,8))
+        # fig, axs = plt.subplots(2, 1, figsize=(8,8))
 
         self.learning_rate = mu
         epochs = np.arange(epochs)
         cost_arr = []
         error_arr = []
         for epoch in epochs:
-            cost, error, y_pred = self.forward_propagate(self.Xtr, self.Ytr)
-            cost_arr.append(cost)
+            print("epoch: ", epoch)
+            self.forward_propagate(self.Xtr, self.Ytr)
+
+
+
+            # cost_arr.append(cost)
             # print(error)
-            error_arr.append(error)
-        axs[0].plot(epochs, error_arr, label="missclassifications")
-        axs[1].plot(epochs, cost_arr, label="cost function (MSE)")
-        axs[0].legend()
-        axs[1].legend()
-        plt.show()
+            # error_arr.append(error)
+        # axs[0].plot(epochs, error_arr, label="missclassifications")
+        # axs[1].plot(epochs, cost_arr, label="cost function (MSE)")
+        # axs[0].legend()
+        # axs[1].legend()
+        # plt.show()
 
     def test(self, Xte, Yte):
         cost, error, y_pred = self.forward_propagate(Xte, Yte)
