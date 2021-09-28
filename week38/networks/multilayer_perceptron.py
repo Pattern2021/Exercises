@@ -20,7 +20,7 @@ class Multilayer_perceptron(NeuralNetwork):
     """
     def __init__(self, Xtr, Ytr, network_structure):
         super().__init__(Xtr, Ytr, network_structure)
-        self.prev_delta_w = np.zeros((2, 1))
+        self.prev_delta_w = []
 
     def forward_propagate(self, Xtr, Ytr):
         J = 0
@@ -30,6 +30,7 @@ class Multilayer_perceptron(NeuralNetwork):
 
         y_prev = np.atleast_2d(Xtr)
         self.v_arr = []
+        self.y_arr = [Xtr]
         
         # loops through all layers which has a weight defined.
         for r, layer in enumerate(self.network.layers[1:]):
@@ -41,6 +42,8 @@ class Multilayer_perceptron(NeuralNetwork):
 
             self.v_arr.append(v)
             self.y = self.sigmoid(v)
+            self.y_arr.append(self.y)
+
             y_prev = self.y
 
 
@@ -53,37 +56,62 @@ class Multilayer_perceptron(NeuralNetwork):
         self.backward_propagate(error)
 
     def backward_propagate(self, error):
-        last_delta = error[:, None] * self.sigmoid_derivative(self.y)
+        last_delta = error[:, None] * self.sigmoid_derivative(self.v_arr[-1])
         
         deltas = [last_delta]
 
         # iterates backwards through layers but does not count over input layer
         for layer in self.network.layers[:0:-1]:
             r = layer.index
-            print(deltas[-1].shape, layer.w_mat[:, :-1].shape)
-            e = deltas[-1] @ layer.w_mat[:, :-1]
-            if r >= 2:
-                der = self.sigmoid_derivative(self.v_arr[r - 2])
-                deltas.append(e.T @ der)
-        print(deltas)
-        return deltas
-        
-    def update_weights(self, deltas, x):
+            if r == 1:
+                break
 
-        # is the input from first layer and input from second layer to third layer.
-        y = np.insert(self.y_arr[:-1], 0, x, axis=1)
-        y = y.reshape(y.shape[1], y.shape[2])
+            e = deltas[-1] @ layer.w_mat[:, :-1]
+
+            deltas_in_layer = []
+
+            if r >= 2:
+                der = self.sigmoid_derivative(self.v_arr[r - 2][:, :-1])
+
+                # Calculate delta from elementwise multiplication with error with sigmoid derivative
+                for error_node, der_node in zip(e.T, der.T):
+                    
+                    # For each node calculate deltas
+                    delta_node = error_node * der_node
+                    deltas_in_layer.append(delta_node)
+
+                deltas.append(deltas_in_layer)
+
+        self.update_weights(deltas)
         
+    def update_weights(self, deltas):
+
         # loop through each layer except input layer.
         for r, layer in enumerate(self.network.layers[1:]):
+            
+            if layer.is_output:
+                delta_w = -self.learning_rate * np.sum(deltas[r].T @ self.y_arr[r])
+            else:
+                delta_w = np.zeros((len(deltas[r]), 1))
+                for i, delta in enumerate(deltas[r]):
+                    # print(len(delta), self.y_arr[r][:, i].T.shape, "delta", r)
 
-            delta_w = self.alpha * self.prev_delta_w[r] - self.learning_rate * np.sum(deltas[r] @ y[r].T)
+                    delta_w_node = -self.learning_rate * np.sum(delta @ self.y_arr[r][:, i])
+                    delta_w[i] = delta_w_node.reshape((1,1))
+
+            # delta_w = self.alpha * self.prev_delta_w[r] - self.learning_rate * np.sum(deltas[r] @ y[r].T)
 
             # store this weight
-            self.prev_delta_w[r] = delta_w
+            print(delta_w)
+            # self.prev_delta_w[]
+            # self.prev_delta_w[r] = delta_w
 
-            for neuron in layer.nodes:
-                neuron.change_class_weights(neuron.w + delta_w)
+            for i, neuron in enumerate(layer.nodes):
+                if layer.is_output:
+                    neuron.change_class_weights(neuron.w + delta_w)
+                else:
+                    neuron.change_class_weights(neuron.w + delta_w[i])
+
 
 
     def train(self, mu=1, epochs=1000, alpha=0):

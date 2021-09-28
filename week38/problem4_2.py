@@ -38,7 +38,7 @@ def main():
     network_shape = np.array([2, 2, 1])
 
     ins = Multilayer_perceptron(Xtraining, Ytraining, network_shape)
-    ins.train(0.1, epochs=1, alpha=0.75)
+    ins.train(0.1, epochs=1, alpha=0)
     # ins.plot_training()
     # Xtest, Ytest = ins.shuffle(Xtraining, Ytraining)
     # Xtest = ins.onecolumn(Xtest)
