@@ -24,7 +24,6 @@ class Multilayer_perceptron(NeuralNetwork):
 
     def forward_propagate(self, Xtr, Ytr):
         J = 0
-        it = 0
 
         missclassifications = 0
 
@@ -46,14 +45,16 @@ class Multilayer_perceptron(NeuralNetwork):
 
             y_prev = self.y
 
+        y_hat = self.y
 
         MSE = np.sum((self.y - Ytr) ** 2, axis=0) / len(Xtr)
 
-        error = np.sum((self.y - Ytr), axis=0) / len(Xtr)
-        # J += np.sum(MSE) / len(MSE)
-        # missclassifications += np.sum(np.abs(np.round(y) - Ytr), axis=0)
-        # print(J)
-        self.backward_propagate(error)
+        self.error = np.sum((self.y - Ytr), axis=0) / len(Xtr)
+
+        J += np.sum(MSE) / len(MSE)
+
+        return y_hat
+
 
     def backward_propagate(self, error):
         last_delta = error[:, None] * self.sigmoid_derivative(self.v_arr[-1])
@@ -87,22 +88,22 @@ class Multilayer_perceptron(NeuralNetwork):
     def update_weights(self, deltas):
 
         # loop through each layer except input layer.
-        for r, layer in enumerate(self.network.layers[1:]):
-            
+        for r, layer in enumerate(self.network.layers[:0:-1]):
+
             if layer.is_output:
                 delta_w = -self.learning_rate * np.sum(deltas[r].T @ self.y_arr[r])
+            
             else:
                 delta_w = np.zeros((len(deltas[r]), 1))
                 for i, delta in enumerate(deltas[r]):
-                    # print(len(delta), self.y_arr[r][:, i].T.shape, "delta", r)
 
                     delta_w_node = -self.learning_rate * np.sum(delta @ self.y_arr[r][:, i])
                     delta_w[i] = delta_w_node.reshape((1,1))
-
+            
+            
             # delta_w = self.alpha * self.prev_delta_w[r] - self.learning_rate * np.sum(deltas[r] @ y[r].T)
 
             # store this weight
-            print(delta_w)
             # self.prev_delta_w[]
             # self.prev_delta_w[r] = delta_w
 
@@ -121,49 +122,82 @@ class Multilayer_perceptron(NeuralNetwork):
 
         self.learning_rate = mu
         epochs = np.arange(epochs)
-        cost_arr = []
-        error_arr = []
+
+        errors_arr = []
         for epoch in epochs:
-            print("epoch: ", epoch)
-            self.forward_propagate(self.Xtr, self.Ytr)
+            y_hat = self.forward_propagate(self.Xtr, self.Ytr)
+            self.backward_propagate(self.error)
+            
+            self.Ytr = np.atleast_2d(self.Ytr)
 
+            # print(y_hat.shape, self.Ytr.shape)
 
-
-            # cost_arr.append(cost)
-            # print(error)
-            # error_arr.append(error)
-        # axs[0].plot(epochs, error_arr, label="missclassifications")
-        # axs[1].plot(epochs, cost_arr, label="cost function (MSE)")
-        # axs[0].legend()
-        # axs[1].legend()
+            predictions = (np.round(y_hat.T - self.Ytr) == 1)
+            errors = len(predictions[predictions])
+            errors_arr.append(errors)
+        print(errors)
+        self.test(self.Xtr, self.Ytr)
+        # plt.plot(epochs, errors_arr)
         # plt.show()
 
+
     def test(self, Xte, Yte):
-        cost, error, y_pred = self.forward_propagate(Xte, Yte)
-        return cost, error, y_pred
+        y_hat = self.forward_propagate(Xte, Yte)
+        return y_hat
 
     def plot_training(self):
 
         x1_range = np.linspace(np.min(self.Xtr[:, 0]), np.max(self.Xtr[:, 0]), 50)
         x2_range = np.linspace(np.min(self.Xtr[:, 1]), np.max(self.Xtr[:, 1]), 50)
 
-        X, Y = np.meshgrid(x1_range, x2_range)
+        xx, yy = np.meshgrid(x1_range, x2_range)
         
-        y_fakearr = np.zeros_like(x1_range)
+        xx, yy = xx.reshape(len(x1_range)**2), yy.reshape(len(x2_range)**2)
+        inp = np.transpose(np.vstack((xx, yy)))
+        inp = np.c_[inp, np.ones(inp.shape[0])]
+        y = np.atleast_2d(np.zeros(len(inp)))
+
+        y_hat = self.test(inp, y)
+        y_hat = y_hat.reshape(len(x1_range), len(x1_range))
+
+        print(np.round(y_hat))
+
+        # plt.contourf(x1_range,x2_range, y_hat, cmap="cool")
+        # plt.show()
 
 
-        for i in range(len(X)):
-            vec = np.c_[X[i], Y[i]]
-            vec = self.onecolumn(vec)
+    def plot_canvas(self):
+        # x is the 2-dimensional input data.
+        x1 = x2 = np.arange(np.min(x)-0.5, np.max(x)+0.5, 0.1)
 
-            cost, error, y_pred = self.test(vec, y_fakearr)
-            class_ind = np.where(y_pred == y_fakearr[i], True, False)
-            c1 = vec[class_ind == True]
-            c2 = vec[class_ind == False]
-            plt.scatter(c1[:, 0], c1[:, 1], c="blue", s=1)
-            plt.scatter(c2[:, 0], c2[:, 1], c="red", s=1)
+
+        xx, yy = np.meshgrid(x1, x2)  # Create a grid of points.
+        # Reshape into a 2-dimensional data-matrix.
+        xx, yy = xx.reshape(len(x1)**2), yy.reshape(len(x1)**2)
+        inp = np.transpose(np.vstack((xx, yy)))
+        inp = np.c_[inp, np.ones(inp.shape[0])]  # Augmented space
+
+        # Prediction of model. Change this line to fit your implementation.
+        y_hat, z2, z1 = model.forward_pass(inp)
+        # Reshape into a grid for countourf function.
+        y_hat = y_hat.reshape(len(x1), len(x1))
+
+        # Prediction of model. Change this line to fit your implementation.
+        y_lab, z2, z1 = model.forward_pass(x)
+
+        plt.figure(1)
+        plt.subplot(2, 2, 1)
+        plt.plot(model.loss)
+        plt.plot(model.acc)
+        plt.subplot(2, 2, 2)
+        plt.contourf(x1, x2, y_hat, cmap="cool")
+        plt.scatter(x[:, 0], x[:, 1], c=list(np.round(y_lab)))
+        plt.subplot(2, 2, 3)
+        plt.scatter(z2[:, 0], z2[:, 1], c=list(y))
+        plt.subplot(2, 2, 4)
+        plt.scatter(y_lab, np.zeros((400)), c=list(np.round(y_lab)))
+        plt.tight_layout()
         plt.show()
-
             
         
 
