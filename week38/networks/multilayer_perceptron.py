@@ -21,6 +21,7 @@ class Multilayer_perceptron(NeuralNetwork):
     def __init__(self, Xtr, Ytr, network_structure):
         super().__init__(Xtr, Ytr, network_structure)
         self.prev_delta_w = []
+        self.fig, self.axs = plt.subplots(2, 1, figsize=(8,8))
 
     def forward_propagate(self, Xtr, Ytr):
         J = 0
@@ -53,7 +54,7 @@ class Multilayer_perceptron(NeuralNetwork):
 
         J += np.sum(MSE) / len(MSE)
 
-        return y_hat
+        return np.round(y_hat)
 
 
     def backward_propagate(self, error):
@@ -132,13 +133,16 @@ class Multilayer_perceptron(NeuralNetwork):
 
             # print(y_hat.shape, self.Ytr.shape)
 
-            predictions = (np.round(y_hat.T - self.Ytr) == 1)
+            # predictions = (np.round(y_hat.T - self.Ytr) == 1)
+            predictions = y_hat.T == self.Ytr
             errors = len(predictions[predictions])
             errors_arr.append(errors)
         print(errors)
-        self.test(self.Xtr, self.Ytr)
-        # plt.plot(epochs, errors_arr)
-        # plt.show()
+
+        self.axs[0].plot(epochs, errors_arr)
+        self.axs[0].set_title("Errors")
+        self.axs[0].set_xlabel("Epochs")
+        self.axs[0].set_ylabel("Errors")
 
 
     def test(self, Xte, Yte):
@@ -160,45 +164,13 @@ class Multilayer_perceptron(NeuralNetwork):
         y_hat = self.test(inp, y)
         y_hat = y_hat.reshape(len(x1_range), len(x1_range))
 
-        print(np.round(y_hat))
+        # print(np.round(y_hat)[0:10, 0:10])
 
-        # plt.contourf(x1_range,x2_range, y_hat, cmap="cool")
-        # plt.show()
-
-
-    def plot_canvas(self):
-        # x is the 2-dimensional input data.
-        x1 = x2 = np.arange(np.min(x)-0.5, np.max(x)+0.5, 0.1)
-
-
-        xx, yy = np.meshgrid(x1, x2)  # Create a grid of points.
-        # Reshape into a 2-dimensional data-matrix.
-        xx, yy = xx.reshape(len(x1)**2), yy.reshape(len(x1)**2)
-        inp = np.transpose(np.vstack((xx, yy)))
-        inp = np.c_[inp, np.ones(inp.shape[0])]  # Augmented space
-
-        # Prediction of model. Change this line to fit your implementation.
-        y_hat, z2, z1 = model.forward_pass(inp)
-        # Reshape into a grid for countourf function.
-        y_hat = y_hat.reshape(len(x1), len(x1))
-
-        # Prediction of model. Change this line to fit your implementation.
-        y_lab, z2, z1 = model.forward_pass(x)
-
-        plt.figure(1)
-        plt.subplot(2, 2, 1)
-        plt.plot(model.loss)
-        plt.plot(model.acc)
-        plt.subplot(2, 2, 2)
-        plt.contourf(x1, x2, y_hat, cmap="cool")
-        plt.scatter(x[:, 0], x[:, 1], c=list(np.round(y_lab)))
-        plt.subplot(2, 2, 3)
-        plt.scatter(z2[:, 0], z2[:, 1], c=list(y))
-        plt.subplot(2, 2, 4)
-        plt.scatter(y_lab, np.zeros((400)), c=list(np.round(y_lab)))
-        plt.tight_layout()
+        self.axs[1].contourf(x1_range,x2_range, y_hat, cmap="cool")
+        self.axs[1].scatter(self.Xtr[:, 0], self.Xtr[:, 1], c=list(self.Ytr))
+        self.axs[1].set_title("Decision boundary")
+        self.axs[1].set_xlabel("$x_1$")
+        self.axs[1].set_ylabel("$x_2$")
+        self.fig.tight_layout()
         plt.show()
-            
-        
-
 
