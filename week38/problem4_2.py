@@ -4,7 +4,7 @@ from networks.multilayer_perceptron import Multilayer_perceptron
 
 
 def main():
-    # np.random.seed(1)
+    # np.random.seed(6969)
 
     mu1 = np.array([0, 0])
     mu2 = np.array([1, 1])
@@ -19,32 +19,39 @@ def main():
     cls2_vec1 = np.random.normal(mu3, np.diag(covariance), size=(N, 2))
     cls2_vec2 = np.random.normal(mu4, np.diag(covariance), size=(N, 2))
 
-    # cls1_vec1 = np.random.multivariate_normal(mu1, covariance, size=(N, 2))
-    # cls1_vec2 = np.random.multivariate_normal(mu2, covariance, size=(N, 2))
-    # cls2_vec1 = np.random.multivariate_normal(mu3, covariance, size=(N, 2))
-    # cls2_vec2 = np.random.multivariate_normal(mu4, covariance, size=(N, 2))
+    # cls1_vec1_x, cls1_vec1_y = np.random.multivariate_normal(mu1, covariance, size=(N, 2))
+    # cls1_vec2_x, cls1_vec2_y = np.random.multivariate_normal(mu2, covariance, size=(N, 2))
+    # cls2_vec1_x, cls2_vec1_y = np.random.multivariate_normal(mu3, covariance, size=(N, 2))
+    # cls2_vec2_x, cls2_vec2_y = np.random.multivariate_normal(mu4, covariance, size=(N, 2))
+
+    # cls1_vec1 = np.c_[cls1_vec1_x, cls1_vec1_y]
+    # cls1_vec2 = np.c_[cls1_vec2_x, cls1_vec2_y]
+    # cls2_vec1 = np.c_[cls2_vec1_x, cls1_vec2_y]
+    # cls2_vec2 = np.c_[cls2_vec2_x, cls2_vec2_y]
+
+    # print(cls1_vec1)
+    # exit()
 
     cls1 = np.concatenate((cls1_vec1, cls1_vec2), axis=0)
     cls2 = np.concatenate((cls2_vec1, cls2_vec2), axis=0)
     y1 = np.ones(len(cls1[:, 0]))
     y2 = np.zeros(len(cls2[:, 0]))
 
-    # plt.plot(cls1[:, 0], cls1[:, 1], "b.")
-    # plt.plot(cls2[:, 0], cls2[:, 1], "r.")
-    # plt.show()
 
     Xtraining = np.concatenate((cls1, cls2), axis=0)
     Ytraining = np.atleast_2d(np.concatenate((y1, y2), axis=0))
     network_shape = np.array([2, 2, 1])
 
-    ins = Multilayer_perceptron(Xtraining, Ytraining, network_shape)
-    ins.train(0.01, epochs=1000, alpha=0)
-    ins.plot_training()
-    # Xtest, Ytest = ins.shuffle(Xtraining, Ytraining)
-    # Xtest = ins.onecolumn(Xtest)
-    # Xtest = Xtest[:30]
-    # Ytest = Ytest[:30]
-    # ins.test(Xtest, Ytest)
+    learning_rates = np.logspace(-2, -3.5, 10)
+    fig, axs = plt.subplots(2, len(learning_rates), figsize=(16, 8), sharey="row")
+    
+    for i, lr in enumerate(learning_rates):
+        ins = Multilayer_perceptron(Xtraining, Ytraining, network_shape)
+        ins.train(lr, epochs=1000, alpha=0, ax=axs[0, i])
+        ins.plot_training(axs[1, i], lr)
+    fig.tight_layout()
+    plt.show()
+    
 
 if __name__ == "__main__":
     main()

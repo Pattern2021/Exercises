@@ -21,7 +21,6 @@ class Multilayer_perceptron(NeuralNetwork):
     def __init__(self, Xtr, Ytr, network_structure):
         super().__init__(Xtr, Ytr, network_structure)
         self.prev_delta_w = []
-        self.fig, self.axs = plt.subplots(2, 1, figsize=(8,8))
 
     def forward_propagate(self, Xtr, Ytr):
         J = 0
@@ -50,7 +49,15 @@ class Multilayer_perceptron(NeuralNetwork):
 
         MSE = np.sum((self.y - Ytr) ** 2, axis=0) / len(Xtr)
 
-        self.error = np.sum((self.y - Ytr), axis=0) / len(Xtr)
+        self.error = 0.5 * np.sum((self.y - Ytr), axis=0) / len(Xtr)
+
+        # self.error = 0.5 * np.sum((self.y - Ytr)**2, axis=0) maybe
+
+
+        # print(self.error)
+        # if layer.index == 2:
+        #     print(self.y.shape, Ytr.shape)
+        #     exit()
 
         J += np.sum(MSE) / len(MSE)
 
@@ -92,13 +99,13 @@ class Multilayer_perceptron(NeuralNetwork):
         for r, layer in enumerate(self.network.layers[:0:-1]):
 
             if layer.is_output:
-                delta_w = -self.learning_rate * np.sum(deltas[r].T @ self.y_arr[r])
+                delta_w = - self.learning_rate * np.sum(deltas[r].T @ self.y_arr[r])
             
             else:
                 delta_w = np.zeros((len(deltas[r]), 1))
                 for i, delta in enumerate(deltas[r]):
 
-                    delta_w_node = -self.learning_rate * np.sum(delta @ self.y_arr[r][:, i])
+                    delta_w_node = - self.learning_rate * np.sum(delta @ self.y_arr[r][:, i])
                     delta_w[i] = delta_w_node.reshape((1,1))
             
             
@@ -116,7 +123,7 @@ class Multilayer_perceptron(NeuralNetwork):
 
 
 
-    def train(self, mu=1, epochs=1000, alpha=0):
+    def train(self, mu=1, epochs=1000, alpha=0, ax=None):
         self.alpha = alpha
 
         # fig, axs = plt.subplots(2, 1, figsize=(8,8))
@@ -134,22 +141,22 @@ class Multilayer_perceptron(NeuralNetwork):
             # print(y_hat.shape, self.Ytr.shape)
 
             # predictions = (np.round(y_hat.T - self.Ytr) == 1)
-            predictions = y_hat.T == self.Ytr
+            predictions = y_hat.T != self.Ytr
             errors = len(predictions[predictions])
             errors_arr.append(errors)
         print(errors)
 
-        self.axs[0].plot(epochs, errors_arr)
-        self.axs[0].set_title("Errors")
-        self.axs[0].set_xlabel("Epochs")
-        self.axs[0].set_ylabel("Errors")
+        ax.plot(epochs, errors_arr)
+        ax.set_title("Errors")
+        ax.set_xlabel("Epochs")
+        ax.set_ylabel("Errors")
 
 
     def test(self, Xte, Yte):
         y_hat = self.forward_propagate(Xte, Yte)
         return y_hat
 
-    def plot_training(self):
+    def plot_training(self, ax, lr):
 
         x1_range = np.linspace(np.min(self.Xtr[:, 0]), np.max(self.Xtr[:, 0]), 50)
         x2_range = np.linspace(np.min(self.Xtr[:, 1]), np.max(self.Xtr[:, 1]), 50)
@@ -166,11 +173,9 @@ class Multilayer_perceptron(NeuralNetwork):
 
         # print(np.round(y_hat)[0:10, 0:10])
 
-        self.axs[1].contourf(x1_range,x2_range, y_hat, cmap="cool")
-        self.axs[1].scatter(self.Xtr[:, 0], self.Xtr[:, 1], c=list(self.Ytr))
-        self.axs[1].set_title("Decision boundary")
-        self.axs[1].set_xlabel("$x_1$")
-        self.axs[1].set_ylabel("$x_2$")
-        self.fig.tight_layout()
-        plt.show()
+        ax.contourf(x1_range,x2_range, y_hat, cmap="cool")
+        ax.scatter(self.Xtr[:, 0], self.Xtr[:, 1], c=list(self.Ytr))
+        ax.set_title("lr = {:.5f}".format(lr))
+        ax.set_xlabel("$x_1$")
+        ax.set_ylabel("$x_2$")
 
