@@ -7,6 +7,7 @@ import sys
 sys.path.insert(0, os.path.dirname(__file__))
 
 from network import Network
+from NeuralNetworkStructurePlot import StructurePlot
 
 class NeuralNetwork:
     """ 
@@ -22,9 +23,13 @@ class NeuralNetwork:
     """
     def __init__(self, Xtr, Ytr, network_structure):
         self.network = Network(network_structure)
+        self.struct = StructurePlot(self.network.shape)
         self.w = self.network.w
         self.Xtr, self.Ytr = self.shuffle(Xtr, Ytr)
         self.Xtr = np.append(self.Xtr, np.ones((len(self.Xtr), 1)), axis=1)
+
+    def plot_network(self, ax):
+        self.struct.plot_structure(ax)
 
     @staticmethod
     def onecolumn(arr):

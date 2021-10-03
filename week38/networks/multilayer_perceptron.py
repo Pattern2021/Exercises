@@ -126,11 +126,13 @@ class Multilayer_perceptron(NeuralNetwork):
         ax.set_xlabel("Epochs")
         ax.set_ylabel("Errors")
 
+        return errors_arr[-1]
+
     def test(self, Xte, Yte):
         y_hat = self.forward_propagate(Xte, Yte)
         return y_hat
 
-    def plot_training(self, ax, lr, time):
+    def plot_training(self, ax, lr, time=None):
 
         x1_range = np.linspace(np.min(self.Xtr[:, 0]), np.max(self.Xtr[:, 0]), 50)
         x2_range = np.linspace(np.min(self.Xtr[:, 1]), np.max(self.Xtr[:, 1]), 50)
@@ -145,11 +147,12 @@ class Multilayer_perceptron(NeuralNetwork):
         y_hat = self.test(inp, y)
         y_hat = y_hat.reshape(len(x1_range), len(x1_range))
 
-        # print(np.round(y_hat)[0:10, 0:10])
-
         ax.contourf(x1_range,x2_range, y_hat, cmap="cool")
         ax.scatter(self.Xtr[:, 0], self.Xtr[:, 1], c=list(self.Ytr), s=5)
-        ax.set_title("lr = {:.4f}, t = {:.3f}".format(lr, time))
+        if time:
+            ax.set_title("lr = {:.4f}, t = {:.3f}".format(lr, time))
+        else:
+            ax.set_title("lr = {:.4f}".format(lr))
         ax.set_xlabel("$x_1$")
         ax.set_ylabel("$x_2$")
 
