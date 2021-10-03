@@ -42,7 +42,7 @@ def main():
     Ytraining = np.atleast_2d(np.concatenate((y1, y2), axis=0))
     network_shape = np.array([2, 2, 1])
 
-    learning_rates = np.logspace(-2, -3.5, 10)
+    learning_rates = np.logspace(-1.5, -2, 4)
     fig, axs = plt.subplots(2, len(learning_rates), figsize=(16, 8), sharey="row")
     
     for i, lr in enumerate(learning_rates):

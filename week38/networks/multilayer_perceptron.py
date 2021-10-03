@@ -143,10 +143,12 @@ class Multilayer_perceptron(NeuralNetwork):
             # predictions = (np.round(y_hat.T - self.Ytr) == 1)
             predictions = y_hat.T != self.Ytr
             errors = len(predictions[predictions])
+            if errors == 0:
+                break
             errors_arr.append(errors)
         print(errors)
 
-        ax.plot(epochs, errors_arr)
+        ax.plot(epochs[0:len(errors_arr)], errors_arr)
         ax.set_title("Errors")
         ax.set_xlabel("Epochs")
         ax.set_ylabel("Errors")

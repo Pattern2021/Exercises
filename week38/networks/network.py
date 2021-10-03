@@ -58,7 +58,7 @@ class Node(Network):
             self.w = None
         else:
             # weights at this node including bias. i.e. number of nodes in previous layer plus bias
-            self.w = np.random.uniform(0.5, 1, size=(1, prev_layer_nodes + 1))
+            self.w = np.random.uniform(0.5, 1.5, size=(1, prev_layer_nodes + 1))
 
     def change_class_weights(self, w):
         self.w = w
