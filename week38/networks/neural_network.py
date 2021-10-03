@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from numba import njit
-from time import time
 import os
 import sys
 

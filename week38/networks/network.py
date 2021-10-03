@@ -51,6 +51,7 @@ class Node(Network):
     def __init__(self, layer, index):
         self.layer = layer
         self.index = index
+        self.prev_w = [0]
 
         prev_layer_nodes = self.layer.network.shape[self.layer.index - 1]
 
@@ -60,8 +61,11 @@ class Node(Network):
             # weights at this node including bias. i.e. number of nodes in previous layer plus bias
             self.w = np.random.uniform(0.5, 1.5, size=(1, prev_layer_nodes + 1))
 
-    def change_class_weights(self, w):
-        self.w = w
+    def change_class_weights(self, w, alpha=0):
+
+        # Dont really understand why this yields a problem.
+        self.w = w + alpha * self.prev_w[-1]
+        self.prev_w.append(self.w)
 
         # Updates class hierarchy upwards.
         self.layer.update_class_weight()

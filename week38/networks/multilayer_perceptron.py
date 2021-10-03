@@ -23,9 +23,6 @@ class Multilayer_perceptron(NeuralNetwork):
         self.prev_delta_w = []
 
     def forward_propagate(self, Xtr, Ytr):
-        J = 0
-
-        missclassifications = 0
 
         y_prev = np.atleast_2d(Xtr)
         self.v_arr = []
@@ -50,7 +47,6 @@ class Multilayer_perceptron(NeuralNetwork):
         self.error = (self.y.squeeze() - Ytr).reshape(len(self.y), 1)
 
         return np.round(y_hat)
-
 
     def backward_propagate(self, error):
         last_delta = error * self.sigmoid_derivative(self.v_arr[-1]) #[:, None]
@@ -79,34 +75,32 @@ class Multilayer_perceptron(NeuralNetwork):
                     delta_node = error_node * der_node
                     deltas_in_layer.append(delta_node)
 
-                deltas.append(np.array(deltas_in_layer))
+                deltas.append(np.array(deltas_in_layer).T)
 
         self.update_weights(deltas)
         
     def update_weights(self, deltas):
-
         # loop through each layer except input layer.
         for r, layer in enumerate(self.network.layers[:0:-1]):
-            opposite_index = len(self.network.layers[:0:-1]) - r
+            # opposite_index = len(self.network.layers[:0:-1]) - r
 
             if layer.is_output:
-                delta_w = - self.learning_rate * deltas[r].T @ self.y_arr[opposite_index - 1]
-                # print(delta_w.shape)
+                delta_w = - self.learning_rate * deltas[r].T @ self.y_arr[layer.index - 1]
+
             else:
                 delta_w = []
-                for i, delta in enumerate(deltas[r]):
-                    # se over shapen til y_arr at denne lager riktig shape på delta_w_node
-                    # print("delta: ", delta.shape, self.y_arr[opposite_index][:, i].shape, opposite_index - 1, i, delta_w.shape)
-                    delta_w_node = - self.learning_rate * delta[:, None].T @ self.y_arr[opposite_index - 1]
-                    # print(delta_w_node)
+                for i, delta in enumerate(deltas[r].T):
+                    
+                    delta_w_node = - self.learning_rate * delta[:, None].T @ self.y_arr[layer.index - 1]
+                    
                     delta_w.append(delta_w_node)
 
             for i, neuron in enumerate(layer.nodes):
                 if layer.is_output:
-                    neuron.change_class_weights(neuron.w + delta_w)
+                    neuron.change_class_weights(neuron.w + delta_w, self.alpha)
                 else:
-                    neuron.change_class_weights(neuron.w + delta_w[i])
-        # exit()
+                    neuron.change_class_weights(neuron.w + delta_w[i], self.alpha)
+
 
     def train(self, mu=1, epochs=1000, alpha=0, ax=None):
         self.alpha = alpha
@@ -136,7 +130,7 @@ class Multilayer_perceptron(NeuralNetwork):
         y_hat = self.forward_propagate(Xte, Yte)
         return y_hat
 
-    def plot_training(self, ax, lr):
+    def plot_training(self, ax, lr, time):
 
         x1_range = np.linspace(np.min(self.Xtr[:, 0]), np.max(self.Xtr[:, 0]), 50)
         x2_range = np.linspace(np.min(self.Xtr[:, 1]), np.max(self.Xtr[:, 1]), 50)
@@ -155,7 +149,7 @@ class Multilayer_perceptron(NeuralNetwork):
 
         ax.contourf(x1_range,x2_range, y_hat, cmap="cool")
         ax.scatter(self.Xtr[:, 0], self.Xtr[:, 1], c=list(self.Ytr), s=5)
-        ax.set_title("lr = {:.7f}".format(lr))
+        ax.set_title("lr = {:.4f}, t = {:.3f}".format(lr, time))
         ax.set_xlabel("$x_1$")
         ax.set_ylabel("$x_2$")
 
