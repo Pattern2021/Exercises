@@ -2,11 +2,13 @@
 
 *Author: Christian Salomonsen*
 
-### Oppdatering!
-Har en større bug som ser ut til å maksimere feilen, men her er resultatet fra dette.
+### solution to problem 4.2
 
-![NN](img/NN_multiple.png)
+![answer_to_4.2](img/fig_prob_4_2.png)
 
-Endelig en decision boundary som er ikke-lineær.
+Ser fortsatt at feilen øker for en learning rate på 0.0125893. Oppgaven tok ca. 2 uker fra start til slutt...
 
-![bugbug](img/Finally_nonlinearity.png)
+#### Tester samme oppgave med 6 neurons i hidden layer.
+![test_with_6neurons](img/2_class_1_hidden_6_neurons.png)
+
+Ser mye bedre ut
