@@ -40,15 +40,17 @@ def main():
 
     Xtraining = np.concatenate((cls1, cls2), axis=0)
     Ytraining = np.atleast_2d(np.concatenate((y1, y2), axis=0))
-    network_shape = np.array([2, 2, 1])
+    hidden_neurons = 2
+    network_shape = np.array([2, hidden_neurons, 1])
 
-    learning_rates = np.logspace(-1.5, -2, 4)
+    learning_rates = np.logspace(-1.5, -2, 6)
     fig, axs = plt.subplots(2, len(learning_rates), figsize=(16, 8), sharey="row")
     
     for i, lr in enumerate(learning_rates):
         ins = Multilayer_perceptron(Xtraining, Ytraining, network_shape)
         ins.train(lr, epochs=1000, alpha=0, ax=axs[0, i])
         ins.plot_training(axs[1, i], lr)
+    fig.suptitle("2-class neural network with one hidden layer of {} neurons".format(hidden_neurons))
     fig.tight_layout()
     plt.show()
     
