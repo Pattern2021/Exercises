@@ -154,7 +154,7 @@ class Multilayer_perceptron(NeuralNetwork):
         # print(np.round(y_hat)[0:10, 0:10])
 
         ax.contourf(x1_range,x2_range, y_hat, cmap="cool")
-        ax.scatter(self.Xtr[:, 0], self.Xtr[:, 1], c=list(self.Ytr))
+        ax.scatter(self.Xtr[:, 0], self.Xtr[:, 1], c=list(self.Ytr), s=5)
         ax.set_title("lr = {:.7f}".format(lr))
         ax.set_xlabel("$x_1$")
         ax.set_ylabel("$x_2$")
