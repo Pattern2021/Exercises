@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from networks.multilayer_perceptron import Multilayer_perceptron
+# from networks.multilayer_perceptron import Multilayer_perceptron
+from networks import Multilayer_perceptron
 
 
 # np.random.seed(6969)
