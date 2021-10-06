@@ -40,7 +40,7 @@ Ytraining = np.atleast_2d(np.concatenate((y_cls1, y_cls2), axis=0))
 network_shape = np.array([2, 10, 1]) # actually kinda works better than using two hidden layers.
 # network_shape = np.array([2, 3, 2, 1])
 
-learning_rates = np.logspace(-1.5, -3, 7)
+learning_rates = np.logspace(-1.5, -2.5, 7)
 fig, axs = plt.subplots(2, len(learning_rates), figsize=(16, 8), sharey="row")
 
 error = []
@@ -54,15 +54,4 @@ for i, lr in enumerate(learning_rates):
     instances.append(ins)
     error.append(err)
 fig.tight_layout()
-plt.show()
-
-best = np.argmin(error)
-
-best_lr = learning_rates[np.argmin(error)]
-best_training = instances[np.argmin(error)]
-
-fig, axs = plt.subplots(2, 1, figsize=(16,8))
-best_training.plot_training(axs[1], best_lr)
-best_training.plot_network(axs[0])
-
 plt.show()
