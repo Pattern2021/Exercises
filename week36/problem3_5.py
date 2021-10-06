@@ -4,9 +4,9 @@ import os
 import sys
 from time import time
 
-sys.path.insert(0, os.path.abspath(r"C:\Users\Christian Salomonsen\OneDrive - UiT Office 365\Desktop\UIT\FYS-3012\exercises"))
+sys.path.insert(0, os.path.dirname(__file__))
 
-from machinelearning.classifiers.Linear import LinearClassifier
+from LinearClassifiers.classifiers.Linear import LinearClassifier
 
 class Perceptron(LinearClassifier):
     def __init__(self, Xtr1, Xtr2):
@@ -82,8 +82,8 @@ def main():
     ins.plot_training()
     test1 = np.random.normal(mu1, sigma1, size=(30, 2))
     test2 = np.random.normal(mu2, sigma2, size=(30, 2))
-    ins.test(test1, test2)
-    ins.plot_testing()
+    # ins.test(test1, test2)
+    # ins.plot_testing()
 
 
 if __name__ == '__main__':

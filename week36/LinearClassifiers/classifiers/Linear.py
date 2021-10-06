@@ -71,9 +71,6 @@ class LinearClassifier:
 
     def is_trained(self):
         """ Method for checking and handling errors if user is inappropriatly trying to plot training or test before training. """
-        # if not self.trained:
-        #     print("Model not been trained! Use class.train(rho)")
-        #     exit()
         try:
             if not self.trained:
                 raise Exception("Model must be trained!")
