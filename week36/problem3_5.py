@@ -82,8 +82,8 @@ def main():
     ins.plot_training()
     test1 = np.random.normal(mu1, sigma1, size=(30, 2))
     test2 = np.random.normal(mu2, sigma2, size=(30, 2))
-    # ins.test(test1, test2)
-    # ins.plot_testing()
+    ins.test(test1, test2)
+    ins.plot_testing()
 
 
 if __name__ == '__main__':
