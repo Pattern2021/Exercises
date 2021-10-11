@@ -102,12 +102,11 @@ class Multilayer_perceptron(NeuralNetwork):
 
     def train(self, learning_rate=1, epochs=1000, alpha=0, cost="sigmoid", kernel="None"):
         self.alpha = alpha
-
         self.learning_rate = learning_rate
-        epochs = np.arange(epochs)
+        self.epochs = np.arange(epochs)
 
         errors_arr = []
-        for epoch in epochs:
+        for epoch in self.epochs:
             y_hat = self.forward_propagate(self.Xtr, self.Ytr)
             
             self.backward_propagate(self.error)
@@ -119,7 +118,7 @@ class Multilayer_perceptron(NeuralNetwork):
 
             errors_arr.append(errors)
 
-        return errors_arr[-1]
+        return errors_arr
 
     def test(self, Xte, Yte):
         y_hat = self.forward_propagate(Xte, Yte)
@@ -141,7 +140,7 @@ class Multilayer_perceptron(NeuralNetwork):
         y_hat = y_hat.reshape(len(x1_range), len(x1_range))
 
         ax.contourf(x1_range,x2_range, y_hat, cmap="cool")
-        ax.scatter(self.Xtr[:, 0], self.Xtr[:, 1], c=list(self.Ytr), s=5)
+        # ax.scatter(self.Xtr[:, 0], self.Xtr[:, 1], c=list(self.Ytr), s=5)
         if time:
             ax.set_title("lr = {:.4f}, t = {:.3f}".format(lr, time))
         else:
