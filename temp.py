@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 mu1 = np.array([0, 0])
 cov = np.diag([0.1, 0.4])
-N = 100
+N = 1000
 
 data = np.random.multivariate_normal(mu1, cov, N)
 X, Y = data[:, 0], data[:, 1]
