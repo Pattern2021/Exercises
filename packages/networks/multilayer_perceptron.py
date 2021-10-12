@@ -20,10 +20,8 @@ class Multilayer_perceptron(NeuralNetwork):
     """
     def __init__(self, Xtr, Ytr, network_structure):
         super().__init__(Xtr, Ytr, network_structure)
-        self.prev_delta_w = []
 
     def forward_propagate(self, Xtr, Ytr):
-
         y_prev = np.atleast_2d(Xtr)
         self.v_arr = []
         self.y_arr = [Xtr]
@@ -102,14 +100,13 @@ class Multilayer_perceptron(NeuralNetwork):
                     neuron.change_class_weights(neuron.w + delta_w[i], self.alpha)
 
 
-    def train(self, mu=1, epochs=1000, alpha=0, ax=None):
+    def train(self, learning_rate=1, epochs=1000, alpha=0, cost="sigmoid", kernel="None"):
         self.alpha = alpha
-
-        self.learning_rate = mu
-        epochs = np.arange(epochs)
+        self.learning_rate = learning_rate
+        self.epochs = np.arange(epochs)
 
         errors_arr = []
-        for epoch in epochs:
+        for epoch in self.epochs:
             y_hat = self.forward_propagate(self.Xtr, self.Ytr)
             
             self.backward_propagate(self.error)
@@ -120,16 +117,8 @@ class Multilayer_perceptron(NeuralNetwork):
             errors = len(predictions[predictions])
 
             errors_arr.append(errors)
-            # if epoch % 1000 == 0:
-            #     print(self.network.w)
 
-        if ax:
-            ax.plot(epochs, errors_arr)
-            ax.set_title("Errors")
-            ax.set_xlabel("Epochs")
-            ax.set_ylabel("Errors")
-
-        return errors_arr[-1]
+        return errors_arr
 
     def test(self, Xte, Yte):
         y_hat = self.forward_propagate(Xte, Yte)
@@ -151,7 +140,7 @@ class Multilayer_perceptron(NeuralNetwork):
         y_hat = y_hat.reshape(len(x1_range), len(x1_range))
 
         ax.contourf(x1_range,x2_range, y_hat, cmap="cool")
-        ax.scatter(self.Xtr[:, 0], self.Xtr[:, 1], c=list(self.Ytr), s=5)
+
         if time:
             ax.set_title("lr = {:.4f}, t = {:.3f}".format(lr, time))
         else:

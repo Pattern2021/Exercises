@@ -1,0 +1,11 @@
+setup.py
+networks/NeuralNetworkStructurePlot.py
+networks/__init__.py
+networks/formatter.py
+networks/multilayer_perceptron.py
+networks/network.py
+networks/neural_network.py
+networks.egg-info/PKG-INFO
+networks.egg-info/SOURCES.txt
+networks.egg-info/dependency_links.txt
+networks.egg-info/top_level.txt

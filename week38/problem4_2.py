@@ -34,11 +34,16 @@ network_shape = np.array([2, hidden_neurons, 1])
 
 learning_rates = np.logspace(-0.7, -2, 6)
 fig, axs = plt.subplots(2, len(learning_rates), figsize=(16, 8), sharey="row")
+epochs = 1000
 
 for i, lr in enumerate(learning_rates):
     ins = Multilayer_perceptron(Xtraining, Ytraining, network_shape)
-    ins.train(lr, epochs=1000, alpha=0.5, ax=axs[0, i])
+    error = ins.train(lr, epochs=epochs, alpha=0.5)
     ins.plot_training(axs[1, i], lr)
+    axs[1, i].scatter(Xtraining[:, 0], Xtraining[:, 1], c=list(Ytraining), s=5)
+    axs[0, i].plot(np.arange(epochs), error)
+    axs[0, i].set_xlabel("Epochs")
+    axs[0, i].set_ylabel("Error")
 fig.suptitle("2-class neural network with one hidden layer of {} neurons".format(hidden_neurons))
 fig.tight_layout()
 plt.show()

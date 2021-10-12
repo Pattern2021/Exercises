@@ -43,15 +43,17 @@ network_shape = np.array([2, 3, 2, 1])
 learning_rates = np.logspace(-1, -4, 7)
 fig, axs = plt.subplots(2, len(learning_rates), figsize=(16, 8), sharey="row")
 
-error = []
-instances = []
+epochs = 5000
+
 for i, lr in enumerate(learning_rates):
     ins = Multilayer_perceptron(Xtraining, Ytraining, network_shape)
     start = time()
-    err = ins.train(lr, epochs=5000, alpha=0.85, ax=axs[0, i])
+    error = ins.train(lr, epochs=epochs, alpha=0.3)
     stop = time()
     ins.plot_training(axs[1, i], lr, stop - start)
-    instances.append(ins)
-    error.append(err)
+    axs[1, i].scatter(Xtraining[:, 0], Xtraining[:, 1], c=list(Ytraining), s=5)
+    axs[0, i].plot(np.arange(epochs), error)
+    axs[0, i].set_xlabel("Epochs")
+    axs[0, i].set_ylabel("Error")
 fig.tight_layout()
 plt.show()

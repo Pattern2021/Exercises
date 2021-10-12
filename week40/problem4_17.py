@@ -12,8 +12,6 @@ xx, yy = xx.reshape(len(x)**2), yy.reshape(len(x)**2)
 Xtrain = np.c_[xx, yy]
 ytrain = np.where(est_func(Xtrain[:, 0]) > Xtrain[:, 1], 1, 0).reshape(1, -1)
 
-# network_shape = np.array([2, 2, 2, 1])
-# lr = 0.005
 network_shape = np.array([2, 4, 4, 1])
 lr = 0.003
 
