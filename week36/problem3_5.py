@@ -6,7 +6,7 @@ from time import time
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-from LinearClassifiers.classifiers.Linear import LinearClassifier
+from LinearClassifiers.Linear import LinearClassifier
 
 class Perceptron(LinearClassifier):
     def __init__(self, Xtr1, Xtr2):

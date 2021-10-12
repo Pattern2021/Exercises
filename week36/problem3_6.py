@@ -5,7 +5,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath(r"C:\Users\Christian Salomonsen\OneDrive - UiT Office 365\Desktop\UIT\FYS-3012\exercises"))
 
-from machinelearning.classifiers.Linear import LinearClassifier
+from LinearClassifiers.Linear import LinearClassifier
 
 
 class LeastMeanSquares(LinearClassifier):
