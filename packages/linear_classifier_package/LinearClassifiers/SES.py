@@ -1,4 +1,4 @@
-from Linear import *
+from .Linear import *
 
 
 class SumOfErrorSquares(LinearClassifier):
