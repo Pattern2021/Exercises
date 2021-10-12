@@ -20,7 +20,7 @@ lr = 0.003
 fig, axs = plt.subplots(2, 1, figsize=(10, 8))
 
 clf = Multilayer_perceptron(Xtrain, ytrain, network_shape)
-error = clf.train(lr, alpha=0.2, epochs=5000)
+error = clf.train(lr, alpha=0.2, epochs=2000)
 clf.plot_training(axs[1], lr)
 axs[1].plot(x, est_func(x), color="black", label="func to be estimated")
 axs[1].legend()
