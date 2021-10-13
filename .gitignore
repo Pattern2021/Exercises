@@ -4,3 +4,4 @@ vec2d.py
 .gitignore
 .DS_Store
 Pipfile
+Pipfile.lock
